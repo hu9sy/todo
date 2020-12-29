@@ -19,9 +19,15 @@ create:
 	docker-compose exec app php artisan key:generate
 	docker-compose exec app php artisan storage:link
 	@make fresh
+init:
+	docker-compose up -d --build
+	docker-compose exec app composer install
+	docker-compose exec app php artisan key:generate
+	docker-compose exec app php artisan storage:link
+	@make fresh
 restart:
 	@make down
-	@maek up
+	@make up
 app:
 	docker-compose exec app bash
 db:
