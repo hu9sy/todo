@@ -3,10 +3,31 @@ volumes:
   php-fpm-socket:
   db-store:
 services:
-  app:
+  front_web:
     build:
       context: .
-      dockerfile: ./infra/php/Dockerfile
+      dockerfile: infra/frontend/nginx/Dockerfile
+    ports:
+      - ${FRONTEND_WEB_PORT:-80}:80
+    volumes:
+      - ./frontend:/work/frontend
+
+  backend_web:
+    build:
+      context: .
+      dockerfile: infra/backend/nginx/Dockerfile
+    ports:
+      - ${BACKEND_WEB_PORT:-8080}:80
+    volumes:
+      - php-fpm-socket:/var/run/php-fpm
+      - ./backend:/work/backend
+    depends_on:
+      - backend_app
+
+  backend_app:
+    build:
+      context: .
+      dockerfile: infra/backend/php/Dockerfile
     volumes:
       - php-fpm-socket:/var/run/php-fpm
       - ./backend:/work/backend
@@ -20,16 +41,9 @@ services:
       - CACHE_DRIVER=redis
       - REDIS_HOST=cache
       - REDIS_PORT=6379
-
-  web:
-    build:
-      context: .
-      dockerfile: ./infra/nginx/Dockerfile
-    ports:
-      - ${WEB_PORT:-80}:80
-    volumes:
-      - php-fpm-socket:/var/run/php-fpm
-      - ./backend:/work/backend
+    depends_on:
+      - db
+      - cache
 
   db:
     build:

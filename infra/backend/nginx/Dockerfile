@@ -12,6 +12,6 @@ COPY --from=node /usr/local/bin /usr/local/bin
 COPY --from=node /usr/local/lib /usr/local/lib
 COPY --from=node /opt /opt
 
-COPY ./infra/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./infra/backend/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 WORKDIR /work/backend
